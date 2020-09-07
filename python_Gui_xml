@@ -1,0 +1,160 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+#--hejinlan-2020-09-06
+
+from tkinter import *
+from tkinter.messagebox import *
+from tkinter import filedialog
+from xml.etree.ElementTree import ElementTree,Element
+from xml.dom.minidom import parse
+import time
+
+root = Tk()                    
+root.title("处理ts翻译文件小工具")
+
+def readXml(in_path):
+    domTree = parse(in_path)
+    # 文档根元素
+    rootNode = domTree.documentElement
+    print(rootNode.nodeName)
+    return rootNode
+
+def updateXML(fileName,savePathName):
+    domTree = parse(fileName)
+    # 文档根元素
+    rootNode = domTree.documentElement
+    sources = rootNode.getElementsByTagName("source")
+    dataList = []
+    dataList = open_read_txtFile(otherText.get())
+    print(dataList)
+    for src in sources:
+        srcData = src.childNodes[0].data
+       
+        for lst in dataList:
+           lstSrc = lst.split(",")
+           srcId= lstSrc[0]
+           srcMsg= eval(lstSrc[1])
+           if srcId == srcData:
+               pn = src.parentNode
+               translation = pn.getElementsByTagName("translation")[0]
+               translation.childNodes[0].data = srcMsg
+               break
+           
+    with open(savePathName, 'w',encoding='utf-8') as f:
+        domTree.writexml(f, addindent='  ', encoding='utf-8')           
+		
+#获取当前时间
+def get_current_time():
+    current_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    return current_time
+
+#日志动态打印
+def write_log_to_Text(logmsg):
+    global logLineNum
+    logLineNum= 0
+    current_time = get_current_time()
+    logmsg_in = str(current_time) +" " + str(logmsg) + "\n"      #换行
+    msgText.insert(END, logmsg_in)
+    logLineNum = logLineNum + 1
+
+def getSaveFileName(Folderpath):
+    saveText.delete(0, END)
+    listStr0 = fileText.get().split('/')
+    listStr1 = listStr0[len(listStr0)-1].split('_');
+    listStr2 = otherText.get().split('_');
+    listStr3 = listStr2[len(listStr2)-1].split('.');
+    listStr = Folderpath.split('/')
+    st=""
+
+    if len(listStr) > 1:
+        st = "/" if listStr[1] !=''  else  ""
+    savefileName = Folderpath + st + listStr1[0] +'_'+listStr3[0]+"_out.ts"
+    return savefileName
+    
+def open_read_txtFile(fileTextName):
+    print('read {name} context!'.format(name=fileTextName))
+    dataList = []
+    f = open(fileTextName, encoding='UTF-8-sig')
+    while True:
+        context = f.readline()
+        if not context:
+            break        
+        #context = context.strip('\n').split()
+        context = context.strip('\n')
+        dataList.append(context)
+    
+    return dataList
+
+def onEditCallBack(event=None):
+    saveText.delete(0, END)
+    Folderpath = filedialog.askdirectory();
+    saveText.insert(0,getSaveFileName(Folderpath))
+    
+def onFileCallBack():
+  fileText['state'] = 'normal'  
+  Folderpath = filedialog.askdirectory();
+  filepath = filedialog.askopenfilename();
+  fileText.delete(0, END)
+  fileText.insert(0,filepath)
+  fileText['state'] = 'readonly'
+
+  if filepath != "":
+      write_log_to_Text("INFO:open : "+ filepath + " file success")
+  else :
+      write_log_to_Text("ERROR:请选择具体.ts文件！")
+     
+def onOtherCallBack():
+  otherText['state'] = 'normal'  
+  Folderpath = filedialog.askdirectory();
+  filepath = filedialog.askopenfilename();
+  otherText.delete(0, END)
+  otherText.insert(0,filepath)
+  otherText['state'] = 'readonly'
+    if filepath != "":
+      write_log_to_Text("INFO:open : "+ filepath + " file success")
+  else :
+      write_log_to_Text("ERROR:请选择具体.txt文件！")
+  saveText['state'] = 'normal'
+  saveText.bind('<Button-1>', onEditCallBack)
+  saveText.insert(0,getSaveFileName(Folderpath))
+
+def onStartCallBack():
+    xmlFilePath = fileText.get()
+    saveFilePath = saveText.get();
+
+    updateXML(xmlFilePath,saveFilePath)
+    write_log_to_Text("INFO: .ts File Conversion  success . Path: " + saveFilePath)
+      
+label_file=Label(text='模板文件名:')
+label_other=Label(text='内容文件:')
+label_save=Label(text='保存的文件名:')
+fileText =  Entry(root, bd =2,width=75)
+
+otherText =  Entry(root, bd =2,width=75)
+
+saveText =  Entry(root, bd =2,width=75)
+saveText['state'] = 'readonly'
+
+# row,column,sticky
+label_file.grid(row=0,column=0,sticky=W) #一个有sticky,一个没有sticky，以作区分
+label_other.grid(row=1,column=0)
+label_save.grid(row=2,column=0)
+# rowspan,columnspan
+fileText.grid(row=0,column=1)
+otherText.grid(row=1,column=1)
+saveText.grid(row=2,column=1)
+
+btnFile = Button(root, text ="选择文件", bg="lightblue", width=15,command = onFileCallBack)
+btnother = Button(root, text ="选择内容文件", bg="lightblue", width=15,command = onOtherCallBack)
+btnSave = Button(root, text ="生成文件", bg="lightblue", width=15,command = onStartCallBack) 
+btnFile.grid(row=0,column=2)
+btnother.grid(row=1,column=2)
+btnSave.grid(row=2,column=2)
+
+#信息显示
+msgText=Text(root,width= 95,height=10)
+msgText.grid(row=3,column=0,columnspan= 3)
+
+root.mainloop()                 # 进入消息循环
+
+
