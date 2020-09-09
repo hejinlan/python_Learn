@@ -12,6 +12,15 @@ import time
 root = Tk()                    
 root.title("处理ts翻译文件小工具")
 
+#日志动态打印
+def write_log_to_Text(logmsg):
+    global logLineNum
+    logLineNum= 0
+    current_time = get_current_time()
+    logmsg_in = str(current_time) +" " + str(logmsg) + "\n"      #换行
+    msgText.insert(END, logmsg_in)
+    logLineNum = logLineNum + 1
+    
 def readXml(in_path):
     domTree = parse(in_path)
     # 文档根元素
@@ -44,7 +53,7 @@ def updateXML_MsgID(fileName,savePathName):
            
     with open(savePathName, 'w',encoding='utf-8') as f:
         domTree.writexml(f, addindent='  ', encoding='utf-8')
-    write_log_to_Text("INFO: .ts File Conversion  success . Path: " + saveFilePath)
+    write_log_to_Text("INFO: .ts File Conversion  success . Path: " + savePathName)
     
 def updateXML(fileName,savePathName):
     domTree = parse(fileName)
@@ -53,17 +62,17 @@ def updateXML(fileName,savePathName):
     sources = rootNode.getElementsByTagName("source")
     dataList = []
     dataList = open_read_txtFile(otherText.get())
+    
     for src in sources:
         if len(src.childNodes) <= 0 :
             write_log_to_Text("ERROR:请选择V5兼容相应的.ts文件！")
-            return
-        
-        srcData = src.childNodes[0]
+            return      
+        srcData = src.childNodes[0].data
         for lst in dataList:
            lstSrc = lst.split(",")
            srcId= lstSrc[0]
            srcMsg= eval(lstSrc[1])
-           if srcId == "" :#srcData:
+           if srcId == srcData:
                pn = src.parentNode
                translation = pn.getElementsByTagName("translation")[0]
                translation.childNodes[0].data = srcMsg
@@ -72,21 +81,12 @@ def updateXML(fileName,savePathName):
     with open(savePathName, 'w',encoding='utf-8') as f:
         domTree.writexml(f, addindent='  ', encoding='utf-8')
         
-    write_log_to_Text("INFO: .ts File Conversion  success . Path: " + saveFilePath)    
+    write_log_to_Text("INFO: .ts File Conversion  success . Path: " + savePathName)    
 		
 #获取当前时间
 def get_current_time():
     current_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     return current_time
-
-#日志动态打印
-def write_log_to_Text(logmsg):
-    global logLineNum
-    logLineNum= 0
-    current_time = get_current_time()
-    logmsg_in = str(current_time) +" " + str(logmsg) + "\n"      #换行
-    msgText.insert(END, logmsg_in)
-    logLineNum = logLineNum + 1
 
 def getSaveFileName(Folderpath):
     saveText.delete(0, END)
