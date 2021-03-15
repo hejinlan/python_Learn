@@ -102,7 +102,7 @@ def getSaveFileName(Folderpath):
     if len(listStr) > 1:
         st = "/" if listStr[1] !=''  else  ""
         
-    savefileName = Folderpath + st + listStr1[0] +'_'+listStr3[0]+"_out.ts"
+    savefileName = Folderpath + st + listStr1[0] +'_'+listStr3[0]+".ts"
     return savefileName
     
 def open_read_txtFile(fileTextName):
