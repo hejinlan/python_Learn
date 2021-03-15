@@ -52,7 +52,7 @@ def updateXML_MsgID(fileName,savePathName):
                     translation.childNodes[0].data = srcTrans
                     break            
            
-    with open(savePathName, 'w',encoding='utf-8') as f:
+    with open(savePathName, 'wb',encoding='utf-8') as f:
         domTree.writexml(f, addindent='', encoding='utf-8')
     write_log_to_Text("INFO: .ts File Conversion  success . Path: " + savePathName)
     
@@ -80,8 +80,8 @@ def updateXML(fileName,savePathName):
                translation.childNodes[0].data = srcMsg
                break
            
-    with open(savePathName, 'w',encoding='utf-8') as f:
-        domTree.writexml(f, addindent='  ', encoding='utf-8')
+    with open(savePathName, 'wb',encoding='utf-8') as f:
+        domTree.writexml(f, addindent='', encoding='utf-8')
         
     write_log_to_Text("INFO: .ts File Conversion  success . Path: " + savePathName)    
 		
