@@ -67,7 +67,7 @@ def updateXML(fileName,savePathName):
     for src in sources:
         if len(src.childNodes) <= 0 :
             write_log_to_Text("ERROR:请选择V5兼容相应的.ts文件！")
-            return      
+            return
         srcData = src.childNodes[0].data
         for lst in dataList:
            lstSrc = lst.split(",")
