@@ -43,7 +43,8 @@ def updateXML_MsgID(fileName,savePathName):
             for lst in dataList:
                 lstMsg = lst.split(",")
                 idMsg= lstMsg[0]
-                srcTrans= eval(lstMsg[1])
+		srcTrans = lst[len(lstMsg[0])+1:len(lst)]
+                srcTrans= eval(srcTrans)
 
                 if idMsg == msgID:
 
@@ -52,7 +53,7 @@ def updateXML_MsgID(fileName,savePathName):
                     break            
            
     with open(savePathName, 'w',encoding='utf-8') as f:
-        domTree.writexml(f, addindent='  ', encoding='utf-8')
+        domTree.writexml(f, addindent='', encoding='utf-8')
     write_log_to_Text("INFO: .ts File Conversion  success . Path: " + savePathName)
     
 def updateXML(fileName,savePathName):
@@ -71,7 +72,8 @@ def updateXML(fileName,savePathName):
         for lst in dataList:
            lstSrc = lst.split(",")
            srcId= lstSrc[0]
-           srcMsg= eval(lstSrc[1])
+	   srcMsg = lst[len(lstSrc[0])+1:len(lst)]	
+           srcMsg= eval(srcMsg)
            if srcId == srcData:
                pn = src.parentNode
                translation = pn.getElementsByTagName("translation")[0]
