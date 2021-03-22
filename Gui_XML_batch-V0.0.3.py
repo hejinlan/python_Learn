@@ -53,18 +53,16 @@ def readXml(in_path):
     return rootNode
 
 var = IntVar()
-var.set(0)
 def isV5NBFile(fileName):
     domTree = parse(fileName)
     # 文档根元素
     rootNode = domTree.documentElement
     msgLst = rootNode.getElementsByTagName("message")
-
+    var.set(0)
     for msg in msgLst:
         if msg.hasAttribute("id") :
             var.set(1)
-        else:
-            var.set(0)
+	    return
     
 def updateXML_MsgID(fileName,txtFileName,savePathName):
     domTree = parse(fileName)
