@@ -116,8 +116,9 @@ def updateXML(fileName,txtFileName,savePathName):
            if srcId == srcData:
                pn = src.parentNode
                translation = pn.getElementsByTagName("translation")[0]
-               translation.childNodes[0].data = srcMsg
-               break
+               if len(translation.childNodes) > 0:
+                   translation.childNodes[0].data = srcMsg               
+               break		
            
     with open(savePathName, 'w',encoding='utf-8') as f:
         domTree.writexml(f, addindent='', encoding='utf-8')
