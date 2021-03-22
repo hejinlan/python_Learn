@@ -43,14 +43,18 @@ def updateXML_MsgID(fileName,savePathName):
             for lst in dataList:
                 lstMsg = lst.split(",")
                 idMsg= lstMsg[0]
-		srcTrans = lst[len(lstMsg[0])+1:len(lst)]
+                srcTrans = lst[len(lstMsg[0])+1:len(lst)]
                 srcTrans= eval(srcTrans)
 
                 if idMsg == msgID:
 
                     translation = msg.getElementsByTagName("translation")[0]
-                    translation.childNodes[0].data = srcTrans
-                    break            
+		    if len(translation.childNodes) > 0:
+			translation.childNodes[0].data = srcTrans
+                    break
+        else:
+           write_log_to_Text("ERROR:请选择V5NB相应的.ts文件！")
+           return
            
     with open(savePathName, 'w',encoding='utf-8') as f:
         domTree.writexml(f, addindent='', encoding='utf-8')
@@ -72,7 +76,7 @@ def updateXML(fileName,savePathName):
         for lst in dataList:
            lstSrc = lst.split(",")
            srcId= lstSrc[0]
-	   srcMsg = lst[len(lstSrc[0])+1:len(lst)]	
+           srcMsg = lst[len(lstSrc[0])+1:len(lst)]
            srcMsg= eval(srcMsg)
            if srcId == srcData:
                pn = src.parentNode
