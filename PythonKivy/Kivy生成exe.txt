@@ -1,0 +1,48 @@
+# -*- mode: python ; coding: utf-8 -*-
+# 导入需要的模块
+from kivy_deps import sdl2, glew
+# 根据项目情况添加gstreamer（打包视频应用）
+# from kivy_deps import sdl2, glew, gstreamer
+
+block_cipher = None     # 此处在使用--key= 会有变化
+
+
+a = Analysis(['06_PageLayout.py'],
+             pathex=['D:\\001_MyArea\\002_MyCode\\001_PythonProjects\\test\\kivyTest'],
+             binaries=[],
+             datas=[],      # 此处可以添加静态资源，例如你有个图片文件夹imgs，可以这样写[('imgs','imgs'),('test.txt','.')]，打包以后会有一个一样的文件夹，点表示当前文件夹。
+             hiddenimports=[],
+             hookspath=[],
+             runtime_hooks=[],
+             excludes=[],
+             win_no_prefer_redirects=False,
+             win_private_assemblies=False,
+             cipher=block_cipher,
+             noarchive=False)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
+          a.scripts,
+          [],
+          exclude_binaries=True,
+          name='06_PageLayout',     # 生成的exe的名字
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          icon='xiaoqiangclub_logo.ico',    # 添加 exe图标，需要为ico格式
+          upx=True,     # 打包的时候进行压缩，False表示不压缩
+          console=True )    # 是否显示黑窗口，刚开始打包的时候一般都会有问题，建议设为True，解决所有问题后可以设置为False
+coll = COLLECT(exe,Tree('D:\\001_MyArea\\002_MyCode\\001_PythonProjects\\test\\kivyTest'),  # 这里填写 spec文件存放的路径，不包含文件名
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
+               # 根据项目情况添加gstreamer（打包视频应用）
+               # *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins + gstreamer.dep_bins)],
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='test001')  # 文件夹名
+————————————————
+版权声明：本文为CSDN博主「xiaoqiangclub」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/xiaoqiangclub/article/details/118522965
