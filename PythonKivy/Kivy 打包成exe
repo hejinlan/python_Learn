@@ -1,0 +1,157 @@
+https://tieba.baidu.com/p/3235639313
+
+1、进入Kivy目录，kivy.bat，进入kivy运行环境（CMD窗口）。
+>>> cd pyinstaller-2.1
+>>> python pyinstaller.py --onedir --windowed --icon ..\my.iso --name test ..\main.py
+（可选option --onefile --console ）
+2、运行上面的命令后，在当前目录下创建test目录，生成test.spec配置文件。
+3、进入testu目录，删除里面生成的dist、build两个文件夹。
+4、打开test.spec文件。
+开头增加两行：
+from kivy.tools.packaging.pyinstaller_hooks import install_hooks
+install_hooks(globals())
+
+
+5、在a = Analysis一节中，pathex=添加引用的python library的搜索路径。
+特别是通过增加sys.path来import的模块。
+6、在coll = COLLECT(exe,Tree(*..\\test*),
+
+增加Tree路径，把附属的文件自动复制到打包后的目录。
+
+7、最后运行以下命令生成exe：
+>>> python pyinstaller.py test\test.spec -w
+
+
+8、test.spec文件范例：
+
+
+# -*- mode: python -*-
+from kivy.tools.packaging.pyinstaller_hooks import install_hooks
+install_hooks(globals())
+
+a = Analysis([*..\\mypyserver\\service\\main.py*],
+pathex=[*c:\\test*,, *C:\\Python27*, *C:\\Python27\\Lib*, *C:\\Python27\\Lib\\site-packages*, *C:\\PyInstaller-2.1\\kczztiku*,*C:\\kivy*],
+hiddenimports=[],
+runtime_hooks=None)
+pyz = PYZ(a.pure)
+exe = EXE(pyz,
+a.scripts,
+exclude_binaries=True,
+name=*test.exe*,
+debug=False,
+strip=None,
+upx=True,
+console=True , icon=*..\\my.ico*)
+coll = COLLECT(exe,Tree(*..\\test*),
+a.binaries,
+a.zipfiles,
+a.datas,
+strip=None,
+upx=True,
+name=*test*)
+
+
+pyiinstaller支持在windows、linux、mac os三大系统上对python脚本进行打包。
+
+
+在mac os系统下，注意mac app是一个zip压缩包。
+运行app会导致一下文件路径问题。
+第一个运行的主python文件
+os.path.abspath(os.path.dirname(__file__))
+os.path.abspath("")
+双击运行时，返回app所在路径（双击运行）
+在终端运行时，返回终端当前的路径。
+然而：
+由第一个main.py文件import进来的其他模块，则会返回正确的路径。
+如果main文件中涉及路径问题，那么只好再用另外一个start.py文件来import。
+import main
+main.main_function()
+
+
+pyinstaller --onefile 打包为一个文件，
+如要加入图片等附属文件，
+要指定datas += [("package/file.name","/disk/path/file.name","DATA")]
+文件列表也可以用Tree生成。Tree(*/disk/path/file.name*, prefix = *package*)
+
+
+# -*- mode: python -*-
+
+# == onefile spec demo
+
+a = Analysis([*C:\\audio\\service\\start.py*],
+pathex=[*C:\\audio\\service*],
+hiddenimports=[],
+hookspath=None,
+runtime_hooks=None
+dict_tree = Tree(*C:\\audio\\service\\includ*, prefix = **)
+a.datas += dict_tree
+pyz = PYZ(a.pure)
+exe = EXE(pyz,
+a.scripts,
+a.binaries,
+a.zipfiles,
+a.datas,
+name=*service.exe*,
+debug=False,
+strip=None,
+upx=True,
+console=False , icon=*C:\\audio\\service\\my.ico*)
+
+
+如果需要生成一个软件目录 --onedir，
+exe一节需删除 a.binaries, a.zipfiles, a.datas,
+加入exclude_binaries=True,
+然后使用COLLECT 和 Tree 收集附属文件：
+coll = COLLECT(exe,Tree(*C:\\audio\\service\\includ\\*),
+a.binaries, a.zipfiles, a.datas, strip=None, upx=True, name=*service*)
+# ====== 打包为启动器 android Kivy Launcher ============
+cd python-for-android
+
+./distribute.sh -m "sqlite3 android kivy" -u "sqlite3 android kivy"
+
+cd dist/default/
+
+./build.py --package org.kivy.pygame --name "Kivy Launcher" --version 1.8.0.8 --launcher --permission INTERNET --icon templates/launcher-icon.png --presplash templates/launcher-presplash.jpg release
+
+./dex2jar-0.0.9.15/d2j-apk-sign.sh KivyLauncher-1.8.0.8-release-unsigned.apk
+
+# ====== 打包自己的应用 android Kivy myserver =======
+cd python-for-android/dist/default
+
+./build.py --package edu.kc.kczz --name "kczztiku" --version 1.0 --dir ~/mypyserver --icon ~/mypyserver/my.png --presplash ~/mypyserver/presplash.jpg release
+
+./d2j-apk-sign.sh
+
+kivy 打包注意事项：
+
+#============ onefile ============================
+
+# -*- mode: python -*-
+
+#必须添加以下两句：
+from kivy.tools.packaging.pyinstaller_hooks import install_hooks
+install_hooks(globals())
+
+a = Analysis(["C:\\share\\kejian\\main.py"],
+pathex=["C:\\share\\kejian\\"],
+hiddenimports=[],
+# hookspath=None,
+# runtime_hooks=None
+# 必须去掉以上两句
+)
+pyz = PYZ(a.pure)
+
+dict_tree = Tree("C:\\share\\kejian\\s\\", prefix = "")
+a.datas += dict_tree
+
+exe = EXE(pyz,
+a.scripts,
+a.binaries,
+a.zipfiles,
+a.datas,
+name="kejian.exe",
+debug=False,
+strip=None,
+upx=True,
+console=False , icon="C:\\share\\kejian\\my.ico")
+
